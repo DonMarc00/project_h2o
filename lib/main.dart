@@ -1,6 +1,10 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:project_h2o/db_models/reminder_model.dart';
 import 'package:provider/provider.dart';
+
+import 'services/db_service.dart';
+import 'utils/date_utils.dart';
 
 void main() {
   runApp(MyApp());
@@ -126,14 +130,20 @@ class GeneratorPage extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () {
                   appState.toggleFavorite();
+
                 },
                 icon: Icon(icon),
                 label: Text('Like'),
               ),
               SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   appState.getNext();
+                    DBService dbservice = await DBService.getInstance();
+                    Reminder reminder = Reminder(id: 1, triggerTime: DateHelper.formatDateTime(DateTime(0, 0, 0, 1, 1, 1)));
+                    dbservice.insertReminder(reminder);
+                    print(await dbservice.getAllReminders());
+
                 },
                 child: Text('Next'),
               ),
@@ -195,3 +205,4 @@ class BigCard extends StatelessWidget {
     );
   }
 }
+
