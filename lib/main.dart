@@ -1,6 +1,7 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:project_h2o/db_models/reminder_model.dart';
+import 'package:project_h2o/services/db_service_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'services/db_service.dart';
@@ -130,7 +131,7 @@ class GeneratorPage extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () async {
                   appState.toggleFavorite();
-                  DBService dbservice = await DBService.getInstance();
+                  DBService dbservice = await DBServiceProvider.getInstance();
                   print(await dbservice.getAllReminders());
 
                 },
@@ -141,7 +142,7 @@ class GeneratorPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   appState.getNext();
-                    DBService dbservice = await DBService.getInstance();
+                    DBService dbservice = await DBServiceProvider.getInstance();
                     Reminder reminder = Reminder(id: 1, triggerTime: DateHelper.formatDateTime(DateTime(0, 0, 0, 1, 1, 1)));
                     Reminder reminder2 = Reminder(id: 2, triggerTime: DateHelper.formatDateTime(DateTime(3, 4, 5, 20, 20, 20)));
                     dbservice.insertReminder(reminder);
