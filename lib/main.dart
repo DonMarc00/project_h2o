@@ -128,8 +128,10 @@ class GeneratorPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   appState.toggleFavorite();
+                  DBService dbservice = await DBService.getInstance();
+                  print(await dbservice.getAllReminders());
 
                 },
                 icon: Icon(icon),
@@ -141,8 +143,15 @@ class GeneratorPage extends StatelessWidget {
                   appState.getNext();
                     DBService dbservice = await DBService.getInstance();
                     Reminder reminder = Reminder(id: 1, triggerTime: DateHelper.formatDateTime(DateTime(0, 0, 0, 1, 1, 1)));
+                    Reminder reminder2 = Reminder(id: 2, triggerTime: DateHelper.formatDateTime(DateTime(3, 4, 5, 20, 20, 20)));
                     dbservice.insertReminder(reminder);
+                    dbservice.insertReminder(reminder2);
                     print(await dbservice.getAllReminders());
+                    print(await dbservice.getReminderById(1));
+                    dbservice.updateReminder(2, DateTime(0, 0,0, 23, 50, 50));
+                    dbservice.deleteReminder(1);
+                    print(await dbservice.getAllReminders());
+
 
                 },
                 child: Text('Next'),
