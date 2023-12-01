@@ -1,7 +1,6 @@
 FROM growerp/flutter-sdk-image
 WORKDIR /app
 COPY . /app
-RUN chmod -R 777 /app
 
 # Adjust file permissions for specific directories
 
