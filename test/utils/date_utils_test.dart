@@ -11,7 +11,7 @@ void main(){
    test('Formats midnight correctly', () {
      DateTime midnightDateTime = DateTime(2021, 1, 1, 0, 0, 0);
      String result = DateHelper.formatDateTime(midnightDateTime);
-     expect(result, equals('00:00:10'));
+     expect(result, equals('00:00:00'));
    });
 
    test('Formats late night time correctly', () {
