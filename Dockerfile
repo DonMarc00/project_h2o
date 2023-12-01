@@ -6,5 +6,8 @@ COPY . /app
 
 # Add similar lines for other necessary directories
 
+USER root
 RUN flutter pub get
 RUN flutter build apk --release
+
+USER mobiledevops
