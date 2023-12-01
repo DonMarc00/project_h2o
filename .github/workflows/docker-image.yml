@@ -8,9 +8,9 @@ on:
 
 jobs:
 
-  build:
+  build-image:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v3
@@ -18,5 +18,22 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag project_h2o:latest
 
+  flutter-test:
+  
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+
     - name: Run Flutter tests
       run: docker run --rm project_h2o:latest flutter test
+
+  flutter-build-apk:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run Flutter build apk for release
+      run: docker run --rm project_h2o:latest flutter build apk --release
