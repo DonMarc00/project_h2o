@@ -13,4 +13,5 @@ USER mobiledevops
 
 # Get Flutter dependencies and build
 RUN flutter pub get
+RUN flutter test
 RUN flutter build apk --release
