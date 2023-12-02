@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 class Reminder {
   final int id;
   final String triggerTime;

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:path/path.dart';
 import 'package:project_h2o/db_models/reminder_model.dart';
 import 'package:sqflite/sqflite.dart';
 import '../utils/date_utils.dart';
@@ -11,8 +10,8 @@ class DBService {
 
   DBService(this.db);
 
-  Future<void> insertReminder(Reminder reminder) async {
-    await db.insert(
+  Future<int> insertReminder(Reminder reminder) async {
+    return await db.insert(
       "reminders",
       reminder.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -39,13 +38,13 @@ class DBService {
     }
   }
   
-  Future<void> updateReminder(int id, DateTime triggerTime) async {
+  Future<int> updateReminder(int id, DateTime triggerTime) async {
     String time = DateHelper.formatDateTime(triggerTime);
-    await db.rawUpdate("UPDATE reminders SET triggerTime = ? WHERE id = ?", [time, id]);
+    return await db.rawUpdate("UPDATE reminders SET triggerTime = ? WHERE id = ?", [time, id]);
   }
 
-  Future<void> deleteReminder(id) async {
-    await db.rawDelete("DELETE FROM reminders WHERE id = ?", [id]);
+  Future<int> deleteReminder(id) async {
+    return await db.rawDelete("DELETE FROM reminders WHERE id = ?", [id]);
   }
 
 }

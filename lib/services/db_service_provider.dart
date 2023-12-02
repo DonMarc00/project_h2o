@@ -14,9 +14,10 @@ class DBServiceProvider {
     return _instance!;
   }
 
-  static Future<Database> openDatabaseConnection() async{
+  static Future<Database> openDatabaseConnection({bool inMemory = false}) async{
+    String dbPath = inMemory ? ':memory' : join(await getDatabasesPath(), 'reminder_database.db');
     final database = openDatabase(
-      join(await getDatabasesPath(), "reminder_database.db"),
+      dbPath,
       onCreate: (db, version) {
         return db.execute(
             "CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, triggerTime TEXT)");
