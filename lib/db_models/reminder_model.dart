@@ -18,4 +18,13 @@ class Reminder {
   String toString(){
     return "Reminder{id: $id, triggerTime: $triggerTime}";
   }
+
+  int getId(){
+    return id;
+  }
+
+  String getTriggerTime(){
+    return triggerTime;
+  }
+
 }

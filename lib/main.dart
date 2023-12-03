@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'services/db_service.dart';
 import 'utils/date_utils.dart';
+import 'package:project_h2o/widgets/reminder_widget.dart';
 
 void main() {
   runApp(MyApp());
@@ -159,7 +160,11 @@ class GeneratorPage extends StatelessWidget {
               ),
             ],
           ),
-        ],
+          Row(
+            children: [
+              ReminderWidget(Reminder(id: 1, triggerTime: DateHelper.formatDateTime(DateTime(0,0,0,1,1,1)) )),
+            ],
+          ),],
       ),
     );
   }

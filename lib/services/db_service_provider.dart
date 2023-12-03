@@ -20,7 +20,7 @@ class DBServiceProvider {
       dbPath,
       onCreate: (db, version) {
         return db.execute(
-            "CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, triggerTime TEXT)");
+            "CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY AUTOINCREMENT, triggerTime TEXT)");
       },
       version: 1,
     );
