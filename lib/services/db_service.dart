@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:project_h2o/db_models/reminder_model.dart';
 import 'package:sqflite/sqflite.dart';
 import '../utils/date_utils.dart';
@@ -11,11 +12,8 @@ class DBService {
   DBService(this.db);
 
   Future<int> insertReminder(Reminder reminder) async {
-    return await db.insert(
-      "reminders",
-      reminder.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    return await db.rawInsert("INSERT OR IGNORE INTO reminders (triggerTime) VALUES (?)",
+        [reminder.triggerTime]);
   }
 
   Future<List<Reminder>> getAllReminders() async {
