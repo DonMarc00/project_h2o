@@ -16,9 +16,9 @@ class DBServiceProvider {
 
   static Future<Database> openDatabaseConnection({bool inMemory = false}) async{
     String dbPath = inMemory ? ':memory' : join(await getDatabasesPath(), 'reminder_database.db');
-    String sqlCreate = "CREATE TABLE reminders (id INTEGER PRIMARY KEY AUTOINCREMENT, triggerTime TEXT UNIQUE)";
+    String sqlCreate = "CREATE TABLE reminders (id INTEGER PRIMARY KEY AUTOINCREMENT, triggerTime TEXT)";
     if(dbPath.contains("memory")){
-      sqlCreate = "CREATE TABLE reminders (id INTEGER PRIMARY KEY, triggerTime TEXT UNIQUE)";
+      sqlCreate = "CREATE TABLE reminders (id INTEGER PRIMARY KEY, triggerTime TEXT)";
     }
     final database = openDatabase(
       dbPath,

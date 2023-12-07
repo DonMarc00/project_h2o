@@ -12,8 +12,8 @@ class DBService {
   DBService(this.db);
 
   Future<int> insertReminder(Reminder reminder) async {
-    return await db.rawInsert("INSERT OR IGNORE INTO reminders (triggerTime) VALUES (?)",
-        [reminder.triggerTime]);
+    return await db.rawInsert("INSERT INTO reminders (id, triggerTime) VALUES (?,?)",
+        [reminder.id, reminder.triggerTime]);
   }
 
   Future<List<Reminder>> getAllReminders() async {

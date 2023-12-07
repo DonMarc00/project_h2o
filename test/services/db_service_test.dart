@@ -43,7 +43,7 @@ void main() {
 
     expect(result, 1);
 
-    final insertedReminder = await dbService.getReminderById(1);
+    final insertedReminder = await dbService.getReminderById(2);
     expect(insertedReminder, isNotNull);
     expect(insertedReminder?['id'], testReminder.id);
     expect(insertedReminder?['triggerTime'], testReminder.triggerTime);
