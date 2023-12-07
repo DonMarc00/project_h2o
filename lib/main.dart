@@ -156,11 +156,11 @@ class GeneratorPage extends StatelessWidget {
                       triggerTime: DateHelper.formatDateTime(
                           DateTime(3, 4, 5, 20, 20, 20)));
                   Reminder reminder3 = Reminder(
-                      id: 2,
+                      id: 4,
                       triggerTime: DateHelper.formatDateTime(
                           DateTime(3, 4, 5, 20, 20, 20)));
                   Reminder reminder4 = Reminder(
-                      id: 2,
+                      id: 3,
                       triggerTime: DateHelper.formatDateTime(
                           DateTime(3, 4, 5, 20, 20, 20)));
                   dbservice.insertReminder(reminder);
@@ -168,7 +168,7 @@ class GeneratorPage extends StatelessWidget {
                   dbservice.insertReminder(reminder3);
                   dbservice.insertReminder(reminder4);
                   print(await dbservice.getAllReminders());
-                  print(await dbservice.getReminderById(5));
+                  print(await dbservice.getReminderById(3));
                   dbservice.updateReminder(2, DateTime(0, 0, 0, 23, 50, 50));
                   dbservice.deleteReminder(1);
                   print(await dbservice.getAllReminders());
