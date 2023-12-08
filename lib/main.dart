@@ -88,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.favorite),
                     label: Text('Favorites'),
                   ),
-                  NavigationRailDestination(icon: Icon(Icons.list), label: Text("Reminders"))
+                  NavigationRailDestination(
+                      icon: Icon(Icons.list), label: Text("Reminders"))
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
@@ -106,8 +107,49 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: createReminder,
+          tooltip: "Add reminder",
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          child: Icon(Icons.add),
+        ),
       );
     });
+  }
+
+  void createReminder() async {
+    DBService dbService = await DBServiceProvider.getInstance();
+    List<Reminder> reminderList = await dbService.getAllReminders();
+    int maxId = -1;
+    for (Reminder reminder in reminderList) {
+      if (reminder.id > maxId) {
+        maxId = reminder.id;
+      }
+    }
+    if (maxId == -1) return;
+    //Increment by 1 to add new reminder
+    maxId++;
+    // Check if the widget is still in the tree and has a valid context
+    if (!mounted) return;
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    String reminderTime = DateHelper.formatDateTime(
+        DateHelper.convertTimeOfDayToDateTime(selectedTime!));
+    Reminder reminder = Reminder(id: maxId, triggerTime: reminderTime);
+    int i = await dbService.insertReminder(reminder);
+    if (!mounted) return;
+    if (i > 0) {
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reminder added successfully'), backgroundColor: Colors.green),
+      );
+
+      // Refresh the reminder list
+      Provider.of<ReminderState>(context, listen: false).getReminders();
+    }
   }
 }
 

@@ -39,8 +39,11 @@ class _ReminderPageState extends State<ReminderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: appState.widgetList,
+    return ListView.builder(
+      itemCount: appState.reminderList.length,
+      itemBuilder: (context, index) {
+        return ReminderWidget(appState.reminderList[index]);
+      },
     );
   }
 }
