@@ -37,7 +37,7 @@ class DBService {
       return null;
     }
   }
-  
+
   Future<int> updateReminder(int id, DateTime triggerTime) async {
     String time = DateHelper.formatDateTime(triggerTime);
     return await db.rawUpdate("UPDATE reminders SET triggerTime = ? WHERE id = ?", [time, id]);

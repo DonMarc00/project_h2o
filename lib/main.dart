@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'services/db_service.dart';
 import 'utils/date_utils.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
+import 'package:project_h2o/widgets/reminder_page_builder.dart';
 
 void main() {
   runApp(MyApp());
@@ -66,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
         page = GeneratorPage();
       case 1:
         page = FavoritesPage();
+      case 2:
+        page = ReminderPage();
       default:
         throw UnimplementedError("no widget for $selectedIndex");
     }
@@ -85,6 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.favorite),
                     label: Text('Favorites'),
                   ),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.list), label: Text("Reminders"))
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
@@ -102,8 +107,49 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: createReminder,
+          tooltip: "Add reminder",
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          child: Icon(Icons.add),
+        ),
       );
     });
+  }
+
+  void createReminder() async {
+    DBService dbService = await DBServiceProvider.getInstance();
+    List<Reminder> reminderList = await dbService.getAllReminders();
+    int maxId = -1;
+    for (Reminder reminder in reminderList) {
+      if (reminder.id > maxId) {
+        maxId = reminder.id;
+      }
+    }
+    if (maxId == -1) return;
+    //Increment by 1 to add new reminder
+    maxId++;
+    // Check if the widget is still in the tree and has a valid context
+    if (!mounted) return;
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    String reminderTime = DateHelper.formatDateTime(
+        DateHelper.convertTimeOfDayToDateTime(selectedTime!));
+    Reminder reminder = Reminder(id: maxId, triggerTime: reminderTime);
+    int i = await dbService.insertReminder(reminder);
+    if (!mounted) return;
+    if (i > 0) {
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reminder added successfully'), backgroundColor: Colors.green),
+      );
+
+      // Refresh the reminder list
+      Provider.of<ReminderState>(context, listen: false).getReminders();
+    }
   }
 }
 
@@ -134,7 +180,6 @@ class GeneratorPage extends StatelessWidget {
                   appState.toggleFavorite();
                   DBService dbservice = await DBServiceProvider.getInstance();
                   print(await dbservice.getAllReminders());
-
                 },
                 icon: Icon(icon),
                 label: Text('Like'),
@@ -143,18 +188,32 @@ class GeneratorPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   appState.getNext();
-                    DBService dbservice = await DBServiceProvider.getInstance();
-                    Reminder reminder = Reminder(id: 1, triggerTime: DateHelper.formatDateTime(DateTime(0, 0, 0, 1, 1, 1)));
-                    Reminder reminder2 = Reminder(id: 2, triggerTime: DateHelper.formatDateTime(DateTime(3, 4, 5, 20, 20, 20)));
-                    dbservice.insertReminder(reminder);
-                    dbservice.insertReminder(reminder2);
-                    print(await dbservice.getAllReminders());
-                    print(await dbservice.getReminderById(1));
-                    dbservice.updateReminder(2, DateTime(0, 0,0, 23, 50, 50));
-                    dbservice.deleteReminder(1);
-                    print(await dbservice.getAllReminders());
-
-
+                  DBService dbservice = await DBServiceProvider.getInstance();
+                  Reminder reminder = Reminder(
+                      id: 1,
+                      triggerTime: DateHelper.formatDateTime(
+                          DateTime(0, 0, 0, 1, 8, 1)));
+                  Reminder reminder2 = Reminder(
+                      id: 2,
+                      triggerTime: DateHelper.formatDateTime(
+                          DateTime(3, 4, 5, 20, 20, 20)));
+                  Reminder reminder3 = Reminder(
+                      id: 4,
+                      triggerTime: DateHelper.formatDateTime(
+                          DateTime(3, 4, 5, 20, 20, 20)));
+                  Reminder reminder4 = Reminder(
+                      id: 3,
+                      triggerTime: DateHelper.formatDateTime(
+                          DateTime(3, 4, 5, 20, 20, 20)));
+                  dbservice.insertReminder(reminder);
+                  dbservice.insertReminder(reminder2);
+                  dbservice.insertReminder(reminder3);
+                  dbservice.insertReminder(reminder4);
+                  print(await dbservice.getAllReminders());
+                  print(await dbservice.getReminderById(3));
+                  dbservice.updateReminder(2, DateTime(0, 0, 0, 23, 50, 50));
+                  dbservice.deleteReminder(1);
+                  print(await dbservice.getAllReminders());
                 },
                 child: Text('Next'),
               ),
@@ -162,9 +221,13 @@ class GeneratorPage extends StatelessWidget {
           ),
           Row(
             children: [
-              ReminderWidget(Reminder(id: 1, triggerTime: DateHelper.formatDateTime(DateTime(0,0,0,1,1,1)) )),
+              ReminderWidget(Reminder(
+                  id: 1,
+                  triggerTime:
+                      DateHelper.formatDateTime(DateTime(0, 0, 0, 1, 1, 1)))),
             ],
-          ),],
+          ),
+        ],
       ),
     );
   }
@@ -220,4 +283,3 @@ class BigCard extends StatelessWidget {
     );
   }
 }
-
