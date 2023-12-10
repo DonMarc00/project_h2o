@@ -9,26 +9,24 @@ class ReminderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: Colors.white,
-            boxShadow: [BoxShadow(color: Colors.blueAccent, spreadRadius: 3)]),
-        
-        child: Column(
-          children: [
-            Text("ID: ${reminder.id}",
+    return Container(
+      margin: EdgeInsets.all(10),
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.blueAccent, spreadRadius: 3)]),
+
+      child: Column(
+        children: [
+          Text("ID: ${reminder.id}",
+          textScaler: TextScaler.linear(1.3),),
+          Text("Time: ${reminder.triggerTime}",
             textScaler: TextScaler.linear(1.3),),
-            Text("Time: ${reminder.triggerTime}",
-              textScaler: TextScaler.linear(1.3),),
-            ElevatedButton.icon(onPressed: () => {}, icon: Icon(Icons.delete),
-            label: Text("Delete"),
-            )
-          ],
-        ),
+          ElevatedButton.icon(onPressed: () => {}, icon: Icon(Icons.delete),
+          label: Text("Delete"),
+          )
+        ],
       ),
     );
   }

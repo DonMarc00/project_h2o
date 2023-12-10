@@ -26,7 +26,10 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         ),
-        home: MyHomePage(),
+          home: ChangeNotifierProvider(
+            create: (context) => ReminderState(),
+            child: MyHomePage(),
+          ),
       ),
     );
   }
@@ -66,9 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
       case 0:
         page = GeneratorPage();
       case 1:
-        page = FavoritesPage();
-      case 2:
-        page = ReminderPage();
+        page = ChangeNotifierProvider(
+          create: (_) => ReminderState(),
+          child: ReminderPage(),
+        );
       default:
         throw UnimplementedError("no widget for $selectedIndex");
     }
@@ -83,10 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   NavigationRailDestination(
                     icon: Icon(Icons.home),
                     label: Text('Home'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.favorite),
-                    label: Text('Favorites'),
                   ),
                   NavigationRailDestination(
                       icon: Icon(Icons.list), label: Text("Reminders"))
@@ -106,13 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: createReminder,
-          tooltip: "Add reminder",
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          child: Icon(Icons.add),
         ),
       );
     });
@@ -146,9 +139,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Reminder added successfully'), backgroundColor: Colors.green),
       );
-
-      // Refresh the reminder list
-      Provider.of<ReminderState>(context, listen: false).getReminders();
     }
   }
 }
@@ -229,32 +219,6 @@ class GeneratorPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class FavoritesPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    if (appState.favorites.isEmpty) {
-      return Center(
-        child: Text('No favorites yet.'),
-      );
-    }
-    var favorites = appState.favorites;
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text("You have ${favorites.length} favorites:"),
-        ),
-        for (var pair in favorites)
-          ListTile(
-            leading: Icon(Icons.favorite),
-            title: Text(pair.asLowerCase),
-          )
-      ],
     );
   }
 }

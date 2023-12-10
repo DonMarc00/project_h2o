@@ -4,8 +4,11 @@ import 'package:project_h2o/main.dart';
 import 'package:project_h2o/services/db_service.dart';
 import 'package:project_h2o/services/db_service_provider.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
+import 'package:provider/provider.dart';
 
-class ReminderState extends ChangeNotifier{
+import '../utils/date_utils.dart';
+
+class ReminderState extends ChangeNotifier {
   List<Reminder> reminderList = [];
   List<Widget> widgetList = [];
 
@@ -16,7 +19,23 @@ class ReminderState extends ChangeNotifier{
     for (Reminder reminder in reminderList) {
       widgetList.add(ReminderWidget(reminder));
     }
+    print("get reminders called");
     notifyListeners();
+  }
+
+  Future<void> addReminder(Reminder reminder) async {
+    final dbService = await DBServiceProvider.getInstance();
+    int result = await dbService.insertReminder(reminder);
+
+    if (result > 0) {
+      reminderList.add(reminder);
+      widgetList.add(ReminderWidget(reminder));
+      notifyListeners();
+    }
+  }
+
+  int getNextReminderId() {
+    return reminderList.fold(-1, (max, r) => r.id > max ? r.id : max) + 1;
   }
 }
 
@@ -31,19 +50,53 @@ class _ReminderPageState extends State<ReminderPage> {
   @override
   void initState() {
     super.initState();
-    appState = ReminderState();
-    appState.getReminders().then((_) {
-      setState(() {}); // Rebuild the widget after reminders are fetched.
+    Future.microtask(() {
+      appState = Provider.of<ReminderState>(context, listen: false);
+      appState.getReminders();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: appState.reminderList.length,
-      itemBuilder: (context, index) {
-        return ReminderWidget(appState.reminderList[index]);
-      },
+    final appState = Provider.of<ReminderState>(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Reminders"),
+      ),
+      body: ListView.builder(
+        itemCount: appState.reminderList.length,
+        itemBuilder: (context, index) {
+          return ReminderWidget(appState.reminderList[index]);
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: createReminderEntry,
+        child: Icon(Icons.add),
+      ),
     );
+  }
+
+  void createReminderEntry() async {
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (selectedTime != null) {
+      String reminderTime = DateHelper.formatDateTime(
+          DateHelper.convertTimeOfDayToDateTime(selectedTime));
+
+      int newId = appState.getNextReminderId();
+      Reminder newReminder = Reminder(id: newId, triggerTime: reminderTime);
+
+      await appState.addReminder(newReminder);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Reminder added successfully'),
+            backgroundColor: Colors.green),
+      );
+    }
   }
 }
