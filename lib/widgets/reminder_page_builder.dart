@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:project_h2o/db_models/reminder_model.dart';
-import 'package:project_h2o/main.dart';
-import 'package:project_h2o/services/db_service.dart';
 import 'package:project_h2o/services/db_service_provider.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +8,7 @@ import '../utils/date_utils.dart';
 
 class ReminderState extends ChangeNotifier {
   List<Reminder> reminderList = [];
-  List<Widget> widgetList = [];
+  List<ReminderWidget> widgetList = [];
 
   Future<void> getReminders() async {
     final dbservice = await DBServiceProvider.getInstance();
@@ -32,6 +30,15 @@ class ReminderState extends ChangeNotifier {
       widgetList.add(ReminderWidget(reminder));
       notifyListeners();
     }
+  }
+
+  Future<void> deleteReminder(int id) async  {
+    final dbService = await DBServiceProvider.getInstance();
+    dbService.deleteReminder(id);
+    reminderList.removeWhere((reminder) => reminder.getId() == id);
+    widgetList.removeWhere((reminderWidget) => reminderWidget.getReminder().getId() == id);
+    notifyListeners();
+    print("Deleted reminder");
   }
 
   int getNextReminderId() {
