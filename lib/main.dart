@@ -2,14 +2,23 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:project_h2o/db_models/reminder_model.dart';
 import 'package:project_h2o/services/db_service_provider.dart';
+import 'package:project_h2o/services/notification_service.dart';
 import 'package:provider/provider.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:project_h2o/services/notification_service.dart';
 
 import 'services/db_service.dart';
 import 'utils/date_utils.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
 import 'package:project_h2o/widgets/reminder_page_builder.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Europe/Berlin'));
+  NotificationService notificationService = NotificationService();
+  await notificationService.initNotifications();
   runApp(MyApp());
 }
 
@@ -61,6 +70,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
+  late final NotificationService notificationService;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

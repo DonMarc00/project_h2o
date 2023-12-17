@@ -5,10 +5,13 @@ import 'package:project_h2o/widgets/reminder_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/date_utils.dart';
+import 'package:project_h2o/services/notification_service.dart';
 
 class ReminderState extends ChangeNotifier {
   List<Reminder> reminderList = [];
   List<ReminderWidget> widgetList = [];
+
+  final NotificationService notificationService = NotificationService();
 
   Future<void> getReminders() async {
     final dbservice = await DBServiceProvider.getInstance();
@@ -28,6 +31,7 @@ class ReminderState extends ChangeNotifier {
     if (result > 0) {
       reminderList.add(reminder);
       widgetList.add(ReminderWidget(reminder));
+      await notificationService.scheduleNotification(reminder);
       notifyListeners();
     }
   }
