@@ -192,6 +192,8 @@ class GeneratorPage extends StatelessWidget {
               SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () async {
+                  NotificationService ns = NotificationService();
+                  ns.triggerNotificationNow(2);
                   appState.getNext();
                   DBService dbservice = await DBServiceProvider.getInstance();
                   Reminder reminder = Reminder(
