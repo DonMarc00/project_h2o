@@ -12,6 +12,17 @@ import 'services/db_service.dart';
 import 'utils/date_utils.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
 import 'package:project_h2o/widgets/reminder_page_builder.dart';
+import 'package:workmanager/workmanager.dart';
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    // Code to schedule or trigger notifications
+    // You can use inputData to pass data to this background task
+
+    // Important: Return a future indicating the task is complete
+    return Future.value(true);
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
