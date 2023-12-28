@@ -1,9 +1,10 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:project_h2o/interfaces/i_notification_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../db_models/reminder_model.dart';
 
-class NotificationService {
+class NotificationService implements INotificationService{
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   // Initialize the notification settings
@@ -22,6 +23,7 @@ class NotificationService {
   }
 
   // Schedule a notification
+  @override
   Future<void> scheduleNotification(Reminder reminder) async {
     // Convert triggerTime to a DateTime object
     // Extract the current date
