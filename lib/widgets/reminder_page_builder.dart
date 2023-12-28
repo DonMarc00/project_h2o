@@ -4,6 +4,7 @@ import 'package:project_h2o/services/db_service_provider.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
 import 'package:provider/provider.dart';
 
+import '../interfaces/i_notification_service.dart';
 import '../utils/date_utils.dart';
 import 'package:project_h2o/services/notification_service.dart';
 
@@ -11,7 +12,7 @@ class ReminderState extends ChangeNotifier {
   List<Reminder> reminderList = [];
   List<ReminderWidget> widgetList = [];
 
-  final NotificationService notificationService = NotificationService();
+  final INotificationService notificationService = NotificationService();
 
   Future<void> getReminders() async {
     final dbservice = await DBServiceProvider.getInstance();
@@ -59,32 +60,36 @@ class _ReminderPageState extends State<ReminderPage> {
   late ReminderState appState;
 
   @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      appState = Provider.of<ReminderState>(context, listen: false);
-      appState.getReminders();
-    });
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _initAppState(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text("Reminders"),
+            ),
+            body: ListView.builder(
+              itemCount: appState.reminderList.length,
+              itemBuilder: (context, index) {
+                return ReminderWidget(appState.reminderList[index]);
+              },
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: createReminderEntry,
+              child: Icon(Icons.add),
+            ),
+          );
+        } else {
+          return CircularProgressIndicator(); // or some other loading indicator
+        }
+      },
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final appState = Provider.of<ReminderState>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Reminders"),
-      ),
-      body: ListView.builder(
-        itemCount: appState.reminderList.length,
-        itemBuilder: (context, index) {
-          return ReminderWidget(appState.reminderList[index]);
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: createReminderEntry,
-        child: Icon(Icons.add),
-      ),
-    );
+  Future<void> _initAppState() async {
+    appState = Provider.of<ReminderState>(context, listen: false);
+    await appState.getReminders();
   }
 
   void createReminderEntry() async {
