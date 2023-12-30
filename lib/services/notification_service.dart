@@ -22,6 +22,44 @@ class NotificationService implements INotificationService{
     );
   }
 
+  Future<void> scheduleDailyNotification(Reminder reminder) async {
+    // Convert triggerTime to a tz.TZDateTime object for scheduling
+    final timeParts = reminder.getTriggerTime().split(':');
+    final hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    final tz.TZDateTime scheduledTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+
+    // If the scheduled time is in the past, schedule it for the next day
+    final tz.TZDateTime firstOccurrence = scheduledTime.isBefore(now)
+        ? scheduledTime.add(Duration(days: 1))
+        : scheduledTime;
+
+    // Define the notification details
+    var androidDetails = AndroidNotificationDetails(
+      'daily_notification_channel',
+      'Daily Notifications',
+      channelDescription: 'Channel for daily notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    var iosDetails = DarwinNotificationDetails();
+    var platformDetails = NotificationDetails(android: androidDetails, iOS: iosDetails);
+
+    // Schedule the notification to repeat daily
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      reminder.getId(),
+      'Water Reminder',
+      'Time to drink water!',
+      firstOccurrence,
+      platformDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time, // To repeat daily at the same time
+      payload: "Your sister a mister",
+    );
+  }
+
   // Schedule a notification
   @override
   Future<void> scheduleNotification(Reminder reminder) async {
