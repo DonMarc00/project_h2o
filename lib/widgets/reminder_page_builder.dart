@@ -65,20 +65,24 @@ class _ReminderPageState extends State<ReminderPage> {
       future: _initAppState(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text("Reminders"),
-            ),
-            body: ListView.builder(
-              itemCount: appState.reminderList.length,
-              itemBuilder: (context, index) {
-                return ReminderWidget(appState.reminderList[index]);
-              },
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: createReminderEntry,
-              child: Icon(Icons.add),
-            ),
+          return Consumer<ReminderState>(
+            builder: (context, appState, child) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text("Reminders"),
+                ),
+                body: ListView.builder(
+                  itemCount: appState.reminderList.length,
+                  itemBuilder: (context, index) {
+                    return ReminderWidget(appState.reminderList[index]);
+                  },
+                ),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: createReminderEntry,
+                  child: Icon(Icons.add),
+                ),
+              );
+            }
           );
         } else {
           return CircularProgressIndicator(); // or some other loading indicator
