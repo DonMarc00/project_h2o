@@ -6,7 +6,7 @@ import 'package:project_h2o/services/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:project_h2o/services/notification_service.dart';
+import 'package:project_h2o/widgets/settings_page.dart';
 
 import 'services/db_service.dart';
 import 'utils/date_utils.dart';
@@ -41,15 +41,15 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Namer App',
+        title: 'project_h2o',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         ),
-          home: ChangeNotifierProvider(
-            create: (context) => ReminderState(),
-            child: MyHomePage(),
-          ),
+        home: ChangeNotifierProvider(
+          create: (context) => ReminderState(),
+          child: MyHomePage(),
+        ),
       ),
     );
   }
@@ -99,6 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
           create: (_) => ReminderState(),
           child: ReminderPage(),
         );
+      case 2:
+        page = SettingsPage();
       default:
         throw UnimplementedError("no widget for $selectedIndex");
     }
@@ -115,7 +117,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     label: Text('Home'),
                   ),
                   NavigationRailDestination(
-                      icon: Icon(Icons.list), label: Text("Reminders"))
+                      icon: Icon(Icons.list), label: Text("Reminders")),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.settings), label: Text("Settings")),
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
@@ -163,7 +167,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if (i > 0) {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Reminder added successfully'), backgroundColor: Colors.green),
+        SnackBar(
+            content: Text('Reminder added successfully'),
+            backgroundColor: Colors.green),
       );
     }
   }
@@ -234,6 +240,10 @@ class GeneratorPage extends StatelessWidget {
                   print(await dbservice.getAllReminders());
                 },
                 child: Text('Next'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                )
               ),
             ],
           ),
