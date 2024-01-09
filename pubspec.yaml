@@ -24,6 +24,8 @@ dependencies:
   http: ^0.13.4
   workmanager: ^0.5.2
   shared_preferences: ^2.2.2
+  date_field: ^4.0.1
+  flutter_expandable_fab: ^2.0.0
 
 dev_dependencies:
   mockito: ^5.0.0

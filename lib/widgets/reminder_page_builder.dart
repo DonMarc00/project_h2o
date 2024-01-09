@@ -3,6 +3,7 @@ import 'package:project_h2o/db_models/reminder_model.dart';
 import 'package:project_h2o/services/db_service_provider.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 import '../interfaces/i_notification_service.dart';
 import '../utils/date_utils.dart';
@@ -37,11 +38,12 @@ class ReminderState extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteReminder(int id) async  {
+  Future<void> deleteReminder(int id) async {
     final dbService = await DBServiceProvider.getInstance();
     dbService.deleteReminder(id);
     reminderList.removeWhere((reminder) => reminder.getId() == id);
-    widgetList.removeWhere((reminderWidget) => reminderWidget.getReminder().getId() == id);
+    widgetList.removeWhere(
+        (reminderWidget) => reminderWidget.getReminder().getId() == id);
     notifyListeners();
     print("Deleted reminder");
   }
@@ -65,25 +67,33 @@ class _ReminderPageState extends State<ReminderPage> {
       future: _initAppState(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Consumer<ReminderState>(
-            builder: (context, appState, child) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text("Reminders"),
-                ),
-                body: ListView.builder(
-                  itemCount: appState.reminderList.length,
-                  itemBuilder: (context, index) {
-                    return ReminderWidget(appState.reminderList[index]);
-                  },
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: createReminderEntry,
-                  child: Icon(Icons.add),
-                ),
-              );
-            }
-          );
+          return Consumer<ReminderState>(builder: (context, appState, child) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text("Reminders"),
+              ),
+              body: ListView.builder(
+                itemCount: appState.reminderList.length,
+                itemBuilder: (context, index) {
+                  return ReminderWidget(appState.reminderList[index]);
+                },
+              ),
+              floatingActionButtonLocation: ExpandableFab.location,
+              floatingActionButton: ExpandableFab(
+                children: [
+                  FloatingActionButton(
+                      onPressed: () => {createReminderEntry()},
+                      child: Icon(Icons.add)),
+                  FloatingActionButton(
+                      onPressed: () => {appState.getReminders()},
+                      child: Icon(Icons.access_time)),
+                  FloatingActionButton(
+                      onPressed: () => {appState.getReminders()},
+                      child: Icon(Icons.refresh)),
+                ],
+              ),
+            );
+          });
         } else {
           return CircularProgressIndicator(); // or some other loading indicator
         }

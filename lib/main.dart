@@ -1,5 +1,6 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl_standalone.dart' if (dart.library.html) 'package:intl/intl_browser.dart';
 import 'package:project_h2o/db_models/reminder_model.dart';
 import 'package:project_h2o/services/db_service_provider.dart';
 import 'package:project_h2o/services/notification_service.dart';
@@ -26,6 +27,7 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await findSystemLocale();
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Europe/Berlin'));
   NotificationService notificationService = NotificationService();
