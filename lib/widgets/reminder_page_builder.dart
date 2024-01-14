@@ -4,6 +4,7 @@ import 'package:project_h2o/services/db_service_provider.dart';
 import 'package:project_h2o/widgets/reminder_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../interfaces/i_notification_service.dart';
 import '../utils/date_utils.dart';
@@ -30,11 +31,44 @@ class ReminderState extends ChangeNotifier {
     final dbService = await DBServiceProvider.getInstance();
     int result = await dbService.insertReminder(reminder);
 
-    if (result > 0) {
+    if (result > -1) {
       reminderList.add(reminder);
       widgetList.add(ReminderWidget(reminder));
+      print(reminderList);
+      print(widgetList);
       await notificationService.scheduleDailyNotification(reminder);
-      notifyListeners();
+      getReminders();
+    }
+  }
+
+  Future<void> addReminderCluster() async {
+    final dbService = await DBServiceProvider.getInstance();
+    final prefs = await SharedPreferences.getInstance();
+    final beginningOfDrinkDay = prefs.getString('beginningOfDrinkDay');
+    final endOfDrinkDay = prefs.getString('endOfDrinkDay');
+    final requiredWaterAmount = prefs.getDouble('requiredWaterAmount');
+    print('beginningOfDrinkDay: $beginningOfDrinkDay, endOfDrinkDay: $endOfDrinkDay, requiredWaterAmount: $requiredWaterAmount');
+
+    final beginningOfDrinkDayDateTime = DateHelper.convertStringToDateTime(beginningOfDrinkDay.toString());
+    final endOfDrinkDayDateTime = DateHelper.convertStringToDateTime(endOfDrinkDay.toString());
+    final requiredWaterAmountDouble = requiredWaterAmount as double;
+    final timeDelta = endOfDrinkDayDateTime.difference(beginningOfDrinkDayDateTime).inHours;
+    //requiredWaterAmount in liters divided by 200ml (a glass)
+    final timesToDrink = (requiredWaterAmountDouble / 0.2).ceil(); // Use ceil or floor as needed
+    final timeBetweenDrinks = timeDelta / timesToDrink; // Floating-point division
+
+
+    for (int i = 0; i < timesToDrink; i++) {
+      var scheduledTime = beginningOfDrinkDayDateTime.add(Duration(hours: (timeBetweenDrinks * i).round()));
+      var nextInt = await dbService.getNextReminderId();
+      var reminder = Reminder(triggerTime: DateHelper.formatDateTime(scheduledTime), id: nextInt);
+      int result = await dbService.insertReminder(reminder);
+      if (result > -1) {
+        reminderList.add(reminder);
+        widgetList.add(ReminderWidget(reminder));
+        notificationService.scheduleNotification(reminder);
+        notifyListeners();
+      }
     }
   }
 
@@ -49,6 +83,10 @@ class ReminderState extends ChangeNotifier {
   }
 
   int getNextReminderId() {
+    if(reminderList.isEmpty){
+      return 0;
+    }
+    // Generate a new reminder id based on the highest id in the list
     return reminderList.fold(-1, (max, r) => r.id > max ? r.id : max) + 1;
   }
 }
@@ -85,7 +123,7 @@ class _ReminderPageState extends State<ReminderPage> {
                       onPressed: () => {createReminderEntry()},
                       child: Icon(Icons.add)),
                   FloatingActionButton(
-                      onPressed: () => {appState.getReminders()},
+                      onPressed: () => {createReminderCluster()},
                       child: Icon(Icons.access_time)),
                   FloatingActionButton(
                       onPressed: () => {appState.getReminders()},
@@ -104,6 +142,10 @@ class _ReminderPageState extends State<ReminderPage> {
   Future<void> _initAppState() async {
     appState = Provider.of<ReminderState>(context, listen: false);
     await appState.getReminders();
+  }
+
+  void createReminderCluster() async {
+     appState.addReminderCluster();
   }
 
   void createReminderEntry() async {

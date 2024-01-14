@@ -105,7 +105,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
-    throw UnimplementedError();
   }
 
   void saveRequiredWaterAmount() {

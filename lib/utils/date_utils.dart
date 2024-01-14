@@ -13,4 +13,8 @@ class DateHelper {
     final now = DateTime.now();
     return DateTime(now.year,now.month,now.day,timeOfDay.hour,timeOfDay.minute,0);
   }
+
+  static DateTime convertStringToDateTime(String dateTime){
+    return DateFormat('HH:mm:ss').parse(dateTime);
+  }
 }

@@ -11,11 +11,28 @@ class DBService {
   DBService(this.db);
 
   Future<int> insertReminder(Reminder reminder) async {
-    return await db.insert(
+    // Check if a reminder with the same trigger time already exists
+    bool exists = await reminderExists(reminder.triggerTime);
+    if (exists) {
+      // If it exists, do not insert and perhaps return a specific code or throw an exception
+      return -1; // or throw an exception
+    } else {
+      // If it does not exist, insert the new reminder
+      return await db.insert(
+        "reminders",
+        reminder.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  Future<bool> reminderExists(String triggerTime) async {
+    List<Map> maps = await db.query(
       "reminders",
-      reminder.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      where: "triggerTime = ?",
+      whereArgs: [triggerTime],
     );
+    return maps.isNotEmpty;
   }
 
   Future<List<Reminder>> getAllReminders() async {
@@ -35,6 +52,16 @@ class DBService {
       return result.first;
     } else {
       return null;
+    }
+  }
+
+  //This function gets the highest id in the database and returns it + 1
+  Future<int> getNextReminderId() async {
+    List<Map<String, dynamic>> result = await db.rawQuery("SELECT MAX(id) FROM reminders");
+    if(result.isNotEmpty && result.first.values.first != null){
+      return result.first.values.first + 1;
+    } else {
+      return 0;
     }
   }
 
