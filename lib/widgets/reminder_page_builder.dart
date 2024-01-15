@@ -66,7 +66,7 @@ class ReminderState extends ChangeNotifier {
       if (result > -1) {
         reminderList.add(reminder);
         widgetList.add(ReminderWidget(reminder));
-        notificationService.scheduleNotification(reminder);
+        notificationService.scheduleDailyNotification(reminder);
         notifyListeners();
       }
     }
