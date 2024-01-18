@@ -34,6 +34,7 @@ void main() async {
   tz.setLocalLocation(tz.getLocation('Europe/Berlin'));
   NotificationService notificationService = NotificationService();
   await notificationService.initNotifications();
+  await notificationService.rescheduleNotifications();
   runApp(MyApp());
 }
 

@@ -1,8 +1,11 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:project_h2o/interfaces/i_notification_service.dart';
+import 'package:project_h2o/services/db_service_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../db_models/reminder_model.dart';
+import 'db_service.dart';
 
 class NotificationService implements INotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -146,6 +149,18 @@ class NotificationService implements INotificationService {
         platformDetails,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime);
+  }
+
+  Future<void> rescheduleNotifications() async {
+    DBService dbService = await DBServiceProvider.getInstance(); // Replace with your DB instance
+    List<Reminder> reminders = await dbService.getAllReminders();
+
+    for (var reminder in reminders) {
+      // Reschedule each reminder as a notification
+      // Note: Ensure that your NotificationService can handle rescheduling
+      //       based on Reminder objects or their properties.
+      await scheduleDailyNotification(reminder);
+    }
   }
 
   // Handle notification response when the app is running
